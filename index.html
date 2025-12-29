@@ -90,7 +90,7 @@
             justify-content: center;
             width: 100%;
         }
-        .tanka-text { font-size: clamp(1rem, 4vw, 1.5rem); text-align: center; }
+        .tanka-text { font-size: clamp(1rem, 4vw, 1.4rem); text-align: center; }
         #loading {
             position: fixed;
             inset: 0;
@@ -101,31 +101,11 @@
             z-index: 200;
             font-weight: bold;
         }
-        #debug-info {
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            background: rgba(0,0,0,0.85);
-            color: #0f0;
-            font-family: monospace;
-            font-size: 10px;
-            padding: 10px;
-            z-index: 1000;
-            max-width: 350px;
-            max-height: 200px;
-            overflow-y: auto;
-            pointer-events: auto;
-            display: none;
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
     <div id="loading">LOADING...</div>
-    <div id="debug-info">
-        <button onclick="this.parentElement.style.display='none'" style="color:white; float:right;">[Close]</button>
-        <div id="debug-content"></div>
-    </div>
 
     <div id="menu-btn" onclick="toggleMenu()">
         <div class="btn-line"></div>
@@ -181,18 +161,8 @@
     </footer>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbw-4ORzhR9VZE70928Nv6DvJaa5m_YnKQUA9TkgaJ6B_8NP4CQ8hsmB_NQ7Lr (URL続きを正しく設定してください)";
-        // ※ 上記URLが途切れている場合は、自身のGASデプロイURLに差し替えてください。
-        
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbw-4ORzhR9VZE70928Nv6DvJaa5m_YnKQUA9TkgaJ6B_8NP4CQ8hsmB_NQ7LrQkQ1EV/exec";
         let currentData = null;
-
-        function logDebug(msg) {
-            const debug = document.getElementById('debug-info');
-            const content = document.getElementById('debug-content');
-            debug.style.display = 'block';
-            content.innerText += msg + "\n";
-            console.log(msg);
-        }
 
         function toggleMenu() {
             document.getElementById('side-menu').classList.toggle('open');
@@ -219,9 +189,7 @@
             const pageInfo = currentData.pages.find(p => p.id === id);
             const verses = currentData.verses.filter(v => v.pageId === id).sort((a,b) => a.order - b.order);
             
-            logDebug(`Rendering Rensaku: ${id}, Verses found: ${verses.length}`);
-            
-            titleElement.innerText = pageInfo ? pageInfo.title : "Untitled";
+            titleElement.innerText = pageInfo ? pageInfo.title : "";
             contentElement.innerHTML = verses.length > 0 
                 ? verses.map(v => `<div class="tanka-line"><p class="tanka-text">${v.content.replace(/\n/g, '<br>')}</p></div>`).join('')
                 : '<p class="text-center opacity-50">作品がありません</p>';
@@ -234,14 +202,11 @@
             const rensakuNav = document.getElementById('rensaku-links-nav');
             rensakuNav.innerHTML = '';
             
-            // 判定をより確実に (トリムと小文字化を徹底)
+            // "rensaku" または "renusaku" どちらでも反応するように修正
             const rensakuPages = data.pages.filter(p => {
-                const type = String(p.type || "").trim().toLowerCase();
-                logDebug(`Checking Page: ${p.title}, Type: [${type}]`);
-                return type === 'rensaku';
+                const t = String(p.type || "").toLowerCase();
+                return t.includes('rensaku') || t.includes('renusaku');
             });
-
-            logDebug(`Total Rensaku pages found: ${rensakuPages.length}`);
 
             rensakuPages.forEach(p => {
                 const a = document.createElement('a');
@@ -251,11 +216,13 @@
                 rensakuNav.appendChild(a);
             });
 
-            const homeData = data.pages.find(p => String(p.type || "").trim().toLowerCase() === 'home');
+            // Home Profile
+            const homeData = data.pages.find(p => String(p.type || "").toLowerCase().includes('home'));
             if (homeData) {
                 document.getElementById('profile-text').innerHTML = (homeData.text || "").split('\n\n').map(t => `<p>${t.replace(/\n/g, '<br>')}</p>`).join('');
             }
 
+            // Works
             document.getElementById('works-list').innerHTML = (data.works || []).map(w => `
                 <div>
                     <span class="text-[10px] opacity-50 font-bold">${w.year}</span>
@@ -264,6 +231,7 @@
                 </div>
             `).join('');
 
+            // Links
             document.getElementById('links-container').innerHTML = (data.links || []).map(l => `
                 <a href="${l.url}" target="_blank" class="py-6 border-b border-current border-opacity-10 flex justify-between items-center group">
                     <span class="text-sm tracking-widest font-medium">${l.name}</span>
@@ -277,25 +245,20 @@
 
         function hideLoader() {
             const loader = document.getElementById('loading');
-            loader.style.opacity = '0';
-            setTimeout(() => loader.style.display = 'none', 500);
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
         }
 
         async function init() {
-            logDebug("Initializing...");
             try {
                 const response = await fetch(GAS_URL);
+                if (!response.ok) throw new Error("Network error");
                 const data = await response.json();
-                logDebug("Data fetched from GAS");
-                
-                // GASから届いたPagesデータのTypeの中身をデバッグ表示
-                if (data.pages && data.pages.length > 0) {
-                    logDebug("Pages sample: " + JSON.stringify(data.pages[0]));
-                }
-                
                 buildUI(data);
             } catch (error) {
-                logDebug("Critical Error: " + error.message);
+                console.error(error);
                 hideLoader();
                 const errDiv = document.getElementById('error-message');
                 errDiv.classList.remove('hidden');
