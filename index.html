@@ -101,6 +101,52 @@
             z-index: 200;
             font-weight: bold;
         }
+        
+        /* Form Styles */
+        .contact-form {
+            text-align: left;
+            margin-top: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.7;
+            letter-spacing: 0.1em;
+        }
+        .form-input, .form-textarea {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(202, 7, 68, 0.3);
+            padding: 0.8rem;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            border-radius: 2px;
+            transition: border-color 0.3s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--text-color);
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            margin-top: 2rem;
+            padding: 1rem;
+            border: 1px solid var(--text-color);
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            transition: all 0.3s;
+            background: transparent;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -150,8 +196,30 @@
 
         <section id="contact" class="content-section max-w-2xl mx-auto">
             <h2 class="opacity-50 text-sm font-bold mb-12 tracking-[0.3em]">CONTACT</h2>
-            <div class="rounded-lg p-12 text-center border border-current">
-                <p class="opacity-80">お問い合わせはSNSのDM等でお願いいたします。</p>
+            
+            <div class="max-w-xl mx-auto">
+                <p class="opacity-80 text-sm mb-8 text-center">お問い合わせは以下のフォームよりお願いいたします。<br>送信ボタンを押すとメールソフトが起動します。</p>
+                
+                <form id="email-form" class="contact-form">
+                    <div class="form-group">
+                        <label class="form-label">お名前</label>
+                        <input type="text" id="form-name" class="form-input" required placeholder="お名前">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">件名</label>
+                        <input type="text" id="form-subject" class="form-input" required placeholder="お問い合わせ件名">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">メッセージ</label>
+                        <textarea id="form-message" class="form-textarea" rows="6" required placeholder="内容を入力してください"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">メールを作成する</button>
+                </form>
+
+                <div class="mt-16 pt-12 border-t border-current border-opacity-20 text-center">
+                    <p class="text-[10px] opacity-50 tracking-widest uppercase mb-2">Direct Mail</p>
+                    <p class="text-sm tracking-wider font-medium">nakaimio.tanka@gmail.com</p>
+                </div>
             </div>
         </section>
     </main>
@@ -162,6 +230,7 @@
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbw-4ORzhR9VZE70928Nv6DvJaa5m_YnKQUA9TkgaJ6B_8NP4CQ8hsmB_NQ7LrQkQ1EV/exec";
+        const MY_GMAIL = "nakaimio.tanka@gmail.com";
         let currentData = null;
 
         function toggleMenu() {
@@ -202,7 +271,6 @@
             const rensakuNav = document.getElementById('rensaku-links-nav');
             rensakuNav.innerHTML = '';
             
-            // "rensaku" または "renusaku" どちらでも反応するように修正
             const rensakuPages = data.pages.filter(p => {
                 const t = String(p.type || "").toLowerCase();
                 return t.includes('rensaku') || t.includes('renusaku');
@@ -216,13 +284,11 @@
                 rensakuNav.appendChild(a);
             });
 
-            // Home Profile
             const homeData = data.pages.find(p => String(p.type || "").toLowerCase().includes('home'));
             if (homeData) {
                 document.getElementById('profile-text').innerHTML = (homeData.text || "").split('\n\n').map(t => `<p>${t.replace(/\n/g, '<br>')}</p>`).join('');
             }
 
-            // Works
             document.getElementById('works-list').innerHTML = (data.works || []).map(w => `
                 <div>
                     <span class="text-[10px] opacity-50 font-bold">${w.year}</span>
@@ -231,7 +297,6 @@
                 </div>
             `).join('');
 
-            // Links
             document.getElementById('links-container').innerHTML = (data.links || []).map(l => `
                 <a href="${l.url}" target="_blank" class="py-6 border-b border-current border-opacity-10 flex justify-between items-center group">
                     <span class="text-sm tracking-widest font-medium">${l.name}</span>
@@ -250,6 +315,19 @@
                 setTimeout(() => loader.style.display = 'none', 500);
             }
         }
+
+        // Email Form Handling
+        document.getElementById('email-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('form-name').value;
+            const subject = document.getElementById('form-subject').value;
+            const body = document.getElementById('form-message').value;
+            
+            const mailtoLink = `mailto:${MY_GMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("お名前: " + name + "\n\n" + body)}`;
+            
+            window.location.href = mailtoLink;
+        });
 
         async function init() {
             try {
