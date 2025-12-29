@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>歌人ポートフォリオ | 仲井澪</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
             --bg-color: #fbdff6;
             --text-color: #ca0744;
-            --accent-color: #ca0744;
         }
         body {
             font-family: "游ゴシック体", YuGothic, "游ゴシック", "Yu Gothic", "Noto Serif JP", sans-serif;
@@ -21,11 +19,6 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
-        h2, h3, a, p, span, div {
-            color: inherit;
-        }
-
-        /* Side Menu (Drawer) Settings */
         #side-menu {
             position: fixed;
             top: 0;
@@ -42,11 +35,7 @@
             gap: 1.5rem;
             overflow-y: auto;
         }
-        #side-menu.open {
-            left: 0;
-        }
-
-        /* Menu Background Overlay */
+        #side-menu.open { left: 0; }
         #menu-overlay {
             position: fixed;
             top: 0;
@@ -60,12 +49,7 @@
             opacity: 0;
             transition: opacity 0.4s;
         }
-        #menu-overlay.show {
-            display: block;
-            opacity: 1;
-        }
-
-        /* Hamburger Button */
+        #menu-overlay.show { display: block; opacity: 1; }
         #menu-btn {
             position: fixed;
             top: 25px;
@@ -84,7 +68,6 @@
         #menu-btn.open .btn-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
         #menu-btn.open .btn-line:nth-child(2) { opacity: 0; }
         #menu-btn.open .btn-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
         .nav-link {
             font-size: 1.1rem;
             font-weight: 500;
@@ -94,47 +77,20 @@
             display: block;
         }
         .nav-link:hover { opacity: 0.5; }
-
-        .content-section {
-            display: none;
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-        .content-section.active {
-            display: block;
-        }
+        .content-section { display: none; animation: fadeIn 0.8s ease-out forwards; }
+        .content-section.active { display: block; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Tanka display settings */
         .tanka-line {
             margin-bottom: 3.5rem;
             letter-spacing: 0.15em;
-            white-space: nowrap;
             display: flex;
             justify-content: center;
-            align-items: center;
             width: 100%;
         }
-        .tanka-text {
-            font-size: clamp(0.75rem, 3.5vw, 1.5rem);
-            font-weight: 500;
-            text-align: center;
-        }
-
-        .section-title {
-            color: var(--text-color);
-            opacity: 0.7;
-            font-weight: bold;
-        }
-
-        footer {
-            border-top: 1px solid var(--text-color);
-            opacity: 0.5;
-        }
-
-        /* Loading indicator */
+        .tanka-text { font-size: clamp(1rem, 4vw, 1.5rem); text-align: center; }
         #loading {
             position: fixed;
             inset: 0;
@@ -144,33 +100,36 @@
             background-color: var(--bg-color);
             z-index: 200;
             font-weight: bold;
-            letter-spacing: 0.2em;
-            transition: opacity 0.5s;
         }
-        #error-message {
+        /* デバッグ用表示スタイル */
+        #debug-info {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: #0f0;
+            font-family: monospace;
+            font-size: 10px;
+            padding: 5px;
+            z-index: 1000;
+            max-width: 300px;
+            pointer-events: none;
             display: none;
-            color: var(--text-color);
-            text-align: center;
-            padding: 20px;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- Loading Screen -->
     <div id="loading">LOADING...</div>
+    <div id="debug-info"></div>
 
-    <!-- Menu Button -->
     <div id="menu-btn" onclick="toggleMenu()">
         <div class="btn-line"></div>
         <div class="btn-line"></div>
         <div class="btn-line"></div>
     </div>
-
-    <!-- Overlay -->
     <div id="menu-overlay" onclick="toggleMenu()"></div>
 
-    <!-- Side Menu -->
     <nav id="side-menu">
         <div class="mb-12">
             <a href="#" onclick="showPage('home'); toggleMenu();" class="text-xl font-bold tracking-[0.2em]">仲井澪</a>
@@ -182,68 +141,61 @@
         <a onclick="showPage('contact'); toggleMenu();" class="nav-link">Contact</a>
     </nav>
 
-    <!-- Main Content -->
     <main class="flex-grow pt-32 pb-24 px-6 max-w-4xl mx-auto w-full">
-        
-        <!-- Error display area -->
-        <div id="error-message">
-            <p>データの取得に失敗しました。時間をおいて再度お試しください。</p>
-        </div>
+        <div id="error-message" class="hidden text-center p-10 border border-current"></div>
 
         <section id="home" class="content-section max-w-2xl mx-auto">
-            <h2 class="section-title text-xl mb-12 tracking-[0.3em]">PROFILE</h2>
+            <h2 class="opacity-50 text-sm font-bold mb-12 tracking-[0.3em]">PROFILE</h2>
             <div id="profile-text" class="space-y-8 leading-relaxed text-lg"></div>
         </section>
 
-        <!-- Fixed ID: Changed from renusaku to rensaku -->
+        <!-- rensaku表示用テンプレート -->
         <section id="rensaku-template" class="content-section w-full">
             <h2 id="rensaku-title" class="text-2xl mb-20 tracking-[0.4em] text-center font-bold"></h2>
             <div id="rensaku-content" class="space-y-16"></div>
         </section>
 
         <section id="works" class="content-section max-w-2xl mx-auto">
-            <h2 class="section-title text-xl mb-12 tracking-[0.3em]">WORKS</h2>
+            <h2 class="opacity-50 text-sm font-bold mb-12 tracking-[0.3em]">WORKS</h2>
             <div id="works-list" class="space-y-12"></div>
         </section>
 
         <section id="link" class="content-section max-w-2xl mx-auto">
-            <h2 class="section-title text-xl mb-12 tracking-[0.3em]">LINK</h2>
+            <h2 class="opacity-50 text-sm font-bold mb-12 tracking-[0.3em]">LINK</h2>
             <div id="links-container" class="grid grid-cols-1 gap-5"></div>
         </section>
 
         <section id="contact" class="content-section max-w-2xl mx-auto">
-            <h2 class="section-title text-xl mb-12 tracking-[0.3em]">CONTACT</h2>
-            <div class="rounded-lg p-12 text-center border" style="border-color: var(--text-color); background-color: rgba(202, 7, 68, 0.03);">
-                <p class="mb-6 opacity-80">お問い合わせはSNSのDM等でお願いいたします。</p>
-                <div class="aspect-video flex items-center justify-center bg-transparent border rounded opacity-40" style="border-color: var(--text-color);">
-                    <p>Google Form Placeholder</p>
-                </div>
+            <h2 class="opacity-50 text-sm font-bold mb-12 tracking-[0.3em]">CONTACT</h2>
+            <div class="rounded-lg p-12 text-center border border-current">
+                <p class="opacity-80">お問い合わせはSNSのDM等でお願いいたします。</p>
             </div>
         </section>
     </main>
 
-    <footer class="py-12 text-center text-[10px] tracking-[0.2em]">
-        <p>&copy; <span id="year"></span> MIO NAKAI ALL RIGHTS RESERVED.</p>
+    <footer class="py-12 text-center text-[10px] tracking-[0.2em] border-t border-current opacity-30">
+        <p>&copy; <span id="year"></span> MIO NAKAI</p>
     </footer>
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbw-4ORzhR9VZE70928Nv6DvJaa5m_YnKQUA9TkgaJ6B_8NP4CQ8hsmB_NQ7LrQkQ1EV/exec";
-        
         let currentData = null;
 
+        function logDebug(msg) {
+            const debug = document.getElementById('debug-info');
+            debug.style.display = 'block';
+            debug.innerText += msg + "\n";
+            console.log(msg);
+        }
+
         function toggleMenu() {
-            const menu = document.getElementById('side-menu');
-            const btn = document.getElementById('menu-btn');
-            const overlay = document.getElementById('menu-overlay');
-            menu.classList.toggle('open');
-            btn.classList.toggle('open');
-            overlay.classList.toggle('show');
+            document.getElementById('side-menu').classList.toggle('open');
+            document.getElementById('menu-btn').classList.toggle('open');
+            document.getElementById('menu-overlay').classList.toggle('show');
         }
 
         function showPage(pageId) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            
-            // Fixed Prefix: Changed from renusaku- to rensaku-
             if (pageId.startsWith('rensaku-')) {
                 const id = pageId.replace('rensaku-', '');
                 renderRensaku(id);
@@ -255,30 +207,32 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Fixed Function Name: Changed from renderRenusaku to renderRensaku
         function renderRensaku(id) {
             const titleElement = document.getElementById('rensaku-title');
             const contentElement = document.getElementById('rensaku-content');
             const pageInfo = currentData.pages.find(p => p.id === id);
             const verses = currentData.verses.filter(v => v.pageId === id).sort((a,b) => a.order - b.order);
             
-            titleElement.innerText = pageInfo ? pageInfo.title : "";
-            contentElement.innerHTML = verses.map(v => `
-                <div class="tanka-line">
-                    <p class="tanka-text">${v.content.replace(/\n/g, '&nbsp;&nbsp;')}</p>
-                </div>
-            `).join('');
+            logDebug(`Rendering Rensaku: ${id}, Verses found: ${verses.length}`);
+            
+            titleElement.innerText = pageInfo ? pageInfo.title : "Untitled";
+            contentElement.innerHTML = verses.length > 0 
+                ? verses.map(v => `<div class="tanka-line"><p class="tanka-text">${v.content.replace(/\n/g, '<br>')}</p></div>`).join('')
+                : '<p class="text-center opacity-50">作品がありません</p>';
         }
 
         function buildUI(data) {
             currentData = data;
             document.getElementById('year').innerText = new Date().getFullYear();
             
+            // Side menu rensaku links
             const rensakuNav = document.getElementById('rensaku-links-nav');
             rensakuNav.innerHTML = '';
             
-            // Fixed filtering: Ensures 'rensaku' (lowercase) matches data
-            data.pages.filter(p => p.type.toLowerCase() === 'rensaku').forEach(p => {
+            const rensakuPages = data.pages.filter(p => p.type.toLowerCase() === 'rensaku');
+            logDebug(`Rensaku pages found: ${rensakuPages.length}`);
+
+            rensakuPages.forEach(p => {
                 const a = document.createElement('a');
                 a.className = "nav-link";
                 a.innerText = p.title;
@@ -286,25 +240,26 @@
                 rensakuNav.appendChild(a);
             });
 
+            // Home Profile
             const homeData = data.pages.find(p => p.type.toLowerCase() === 'home');
             if (homeData) {
                 document.getElementById('profile-text').innerHTML = homeData.text.split('\n\n').map(t => `<p>${t.replace(/\n/g, '<br>')}</p>`).join('');
             }
 
-            const worksContainer = document.getElementById('works-list');
-            worksContainer.innerHTML = data.works.map(w => `
-                <div class="mb-10">
-                    <span class="text-[10px] tracking-widest block mb-1 opacity-60 font-bold">${w.year}</span>
-                    <h3 class="text-md font-medium">${w.content}</h3>
-                    ${w.linkUrl ? `<a href="${w.linkUrl}" target="_blank" class="text-xs opacity-50 border-b border-current mt-1 inline-block">詳細</a>` : ''}
+            // Works
+            document.getElementById('works-list').innerHTML = data.works.map(w => `
+                <div>
+                    <span class="text-[10px] opacity-50 font-bold">${w.year}</span>
+                    <h3 class="text-md">${w.content}</h3>
+                    ${w.linkUrl ? `<a href="${w.linkUrl}" target="_blank" class="text-xs border-b border-current opacity-50">Detail</a>` : ''}
                 </div>
             `).join('');
 
-            const linksContainer = document.getElementById('links-container');
-            linksContainer.innerHTML = data.links.map(l => `
-                <a href="${l.url}" target="_blank" class="py-6 border-b px-4 flex justify-between items-center group" style="border-color: rgba(202, 7, 68, 0.1);">
+            // Links
+            document.getElementById('links-container').innerHTML = data.links.map(l => `
+                <a href="${l.url}" target="_blank" class="py-6 border-b border-current border-opacity-10 flex justify-between items-center group">
                     <span class="text-sm tracking-widest font-medium">${l.name}</span>
-                    <span class="text-xs opacity-30 group-hover:translate-x-1 transition-all">→</span>
+                    <span class="opacity-30 group-hover:translate-x-1 transition-all">→</span>
                 </a>
             `).join('');
 
@@ -318,32 +273,19 @@
             setTimeout(() => loader.style.display = 'none', 500);
         }
 
-        async function fetchData(url, retries = 5, delay = 1000) {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                if (retries > 0) {
-                    await new Promise(res => setTimeout(res, delay));
-                    return fetchData(url, retries - 1, delay * 2);
-                }
-                throw error;
-            }
-        }
-
         async function init() {
+            logDebug("Initializing...");
             try {
-                const data = await fetchData(GAS_URL);
-                if (data && data.pages) {
-                    buildUI(data);
-                } else {
-                    throw new Error("Invalid data structure");
-                }
+                const response = await fetch(GAS_URL);
+                const data = await response.json();
+                logDebug("Data fetched successfully");
+                buildUI(data);
             } catch (error) {
-                console.error("Fetch failed:", error);
+                logDebug("Error: " + error.message);
                 hideLoader();
-                document.getElementById('error-message').style.display = 'block';
+                const errDiv = document.getElementById('error-message');
+                errDiv.classList.remove('hidden');
+                errDiv.innerText = "データの読み込みに失敗しました。GASのURLや公開設定を確認してください。";
             }
         }
 
