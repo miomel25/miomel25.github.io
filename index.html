@@ -101,19 +101,20 @@
             z-index: 200;
             font-weight: bold;
         }
-        /* デバッグ用表示スタイル */
         #debug-info {
             position: fixed;
             bottom: 0;
             right: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.85);
             color: #0f0;
             font-family: monospace;
             font-size: 10px;
-            padding: 5px;
+            padding: 10px;
             z-index: 1000;
-            max-width: 300px;
-            pointer-events: none;
+            max-width: 350px;
+            max-height: 200px;
+            overflow-y: auto;
+            pointer-events: auto;
             display: none;
         }
     </style>
@@ -121,7 +122,10 @@
 <body class="min-h-screen flex flex-col">
 
     <div id="loading">LOADING...</div>
-    <div id="debug-info"></div>
+    <div id="debug-info">
+        <button onclick="this.parentElement.style.display='none'" style="color:white; float:right;">[Close]</button>
+        <div id="debug-content"></div>
+    </div>
 
     <div id="menu-btn" onclick="toggleMenu()">
         <div class="btn-line"></div>
@@ -149,7 +153,6 @@
             <div id="profile-text" class="space-y-8 leading-relaxed text-lg"></div>
         </section>
 
-        <!-- rensaku表示用テンプレート -->
         <section id="rensaku-template" class="content-section w-full">
             <h2 id="rensaku-title" class="text-2xl mb-20 tracking-[0.4em] text-center font-bold"></h2>
             <div id="rensaku-content" class="space-y-16"></div>
@@ -178,13 +181,16 @@
     </footer>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbw-4ORzhR9VZE70928Nv6DvJaa5m_YnKQUA9TkgaJ6B_8NP4CQ8hsmB_NQ7LrQkQ1EV/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbw-4ORzhR9VZE70928Nv6DvJaa5m_YnKQUA9TkgaJ6B_8NP4CQ8hsmB_NQ7Lr (URL続きを正しく設定してください)";
+        // ※ 上記URLが途切れている場合は、自身のGASデプロイURLに差し替えてください。
+        
         let currentData = null;
 
         function logDebug(msg) {
             const debug = document.getElementById('debug-info');
+            const content = document.getElementById('debug-content');
             debug.style.display = 'block';
-            debug.innerText += msg + "\n";
+            content.innerText += msg + "\n";
             console.log(msg);
         }
 
@@ -225,12 +231,17 @@
             currentData = data;
             document.getElementById('year').innerText = new Date().getFullYear();
             
-            // Side menu rensaku links
             const rensakuNav = document.getElementById('rensaku-links-nav');
             rensakuNav.innerHTML = '';
             
-            const rensakuPages = data.pages.filter(p => p.type.toLowerCase() === 'rensaku');
-            logDebug(`Rensaku pages found: ${rensakuPages.length}`);
+            // 判定をより確実に (トリムと小文字化を徹底)
+            const rensakuPages = data.pages.filter(p => {
+                const type = String(p.type || "").trim().toLowerCase();
+                logDebug(`Checking Page: ${p.title}, Type: [${type}]`);
+                return type === 'rensaku';
+            });
+
+            logDebug(`Total Rensaku pages found: ${rensakuPages.length}`);
 
             rensakuPages.forEach(p => {
                 const a = document.createElement('a');
@@ -240,14 +251,12 @@
                 rensakuNav.appendChild(a);
             });
 
-            // Home Profile
-            const homeData = data.pages.find(p => p.type.toLowerCase() === 'home');
+            const homeData = data.pages.find(p => String(p.type || "").trim().toLowerCase() === 'home');
             if (homeData) {
-                document.getElementById('profile-text').innerHTML = homeData.text.split('\n\n').map(t => `<p>${t.replace(/\n/g, '<br>')}</p>`).join('');
+                document.getElementById('profile-text').innerHTML = (homeData.text || "").split('\n\n').map(t => `<p>${t.replace(/\n/g, '<br>')}</p>`).join('');
             }
 
-            // Works
-            document.getElementById('works-list').innerHTML = data.works.map(w => `
+            document.getElementById('works-list').innerHTML = (data.works || []).map(w => `
                 <div>
                     <span class="text-[10px] opacity-50 font-bold">${w.year}</span>
                     <h3 class="text-md">${w.content}</h3>
@@ -255,8 +264,7 @@
                 </div>
             `).join('');
 
-            // Links
-            document.getElementById('links-container').innerHTML = data.links.map(l => `
+            document.getElementById('links-container').innerHTML = (data.links || []).map(l => `
                 <a href="${l.url}" target="_blank" class="py-6 border-b border-current border-opacity-10 flex justify-between items-center group">
                     <span class="text-sm tracking-widest font-medium">${l.name}</span>
                     <span class="opacity-30 group-hover:translate-x-1 transition-all">→</span>
@@ -278,14 +286,20 @@
             try {
                 const response = await fetch(GAS_URL);
                 const data = await response.json();
-                logDebug("Data fetched successfully");
+                logDebug("Data fetched from GAS");
+                
+                // GASから届いたPagesデータのTypeの中身をデバッグ表示
+                if (data.pages && data.pages.length > 0) {
+                    logDebug("Pages sample: " + JSON.stringify(data.pages[0]));
+                }
+                
                 buildUI(data);
             } catch (error) {
-                logDebug("Error: " + error.message);
+                logDebug("Critical Error: " + error.message);
                 hideLoader();
                 const errDiv = document.getElementById('error-message');
                 errDiv.classList.remove('hidden');
-                errDiv.innerText = "データの読み込みに失敗しました。GASのURLや公開設定を確認してください。";
+                errDiv.innerText = "データの読み込みに失敗しました。";
             }
         }
 
