@@ -195,9 +195,10 @@
             <div id="profile-text" class="space-y-8 leading-relaxed text-lg"></div>
         </section>
 
-        <section id="renusaku-template" class="content-section w-full">
-            <h2 id="renusaku-title" class="text-2xl mb-20 tracking-[0.4em] text-center font-bold"></h2>
-            <div id="renusaku-content" class="space-y-16"></div>
+        <!-- Fixed ID: Changed from renusaku to rensaku -->
+        <section id="rensaku-template" class="content-section w-full">
+            <h2 id="rensaku-title" class="text-2xl mb-20 tracking-[0.4em] text-center font-bold"></h2>
+            <div id="rensaku-content" class="space-y-16"></div>
         </section>
 
         <section id="works" class="content-section max-w-2xl mx-auto">
@@ -241,10 +242,12 @@
 
         function showPage(pageId) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            if (pageId.startsWith('renusaku-')) {
-                const id = pageId.replace('renusaku-', '');
-                renderRenusaku(id);
-                document.getElementById('renusaku-template').classList.add('active');
+            
+            // Fixed Prefix: Changed from renusaku- to rensaku-
+            if (pageId.startsWith('rensaku-')) {
+                const id = pageId.replace('rensaku-', '');
+                renderRensaku(id);
+                document.getElementById('rensaku-template').classList.add('active');
             } else {
                 const section = document.getElementById(pageId);
                 if (section) section.classList.add('active');
@@ -252,9 +255,10 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function renderRenusaku(id) {
-            const titleElement = document.getElementById('renusaku-title');
-            const contentElement = document.getElementById('renusaku-content');
+        // Fixed Function Name: Changed from renderRenusaku to renderRensaku
+        function renderRensaku(id) {
+            const titleElement = document.getElementById('rensaku-title');
+            const contentElement = document.getElementById('rensaku-content');
             const pageInfo = currentData.pages.find(p => p.id === id);
             const verses = currentData.verses.filter(v => v.pageId === id).sort((a,b) => a.order - b.order);
             
@@ -270,24 +274,23 @@
             currentData = data;
             document.getElementById('year').innerText = new Date().getFullYear();
             
-            // Side menu rensaku links
             const rensakuNav = document.getElementById('rensaku-links-nav');
             rensakuNav.innerHTML = '';
+            
+            // Fixed filtering: Ensures 'rensaku' (lowercase) matches data
             data.pages.filter(p => p.type.toLowerCase() === 'rensaku').forEach(p => {
                 const a = document.createElement('a');
                 a.className = "nav-link";
                 a.innerText = p.title;
-                a.onclick = () => { showPage(`renusaku-${p.id}`); toggleMenu(); };
+                a.onclick = () => { showPage(`rensaku-${p.id}`); toggleMenu(); };
                 rensakuNav.appendChild(a);
             });
 
-            // Home Profile
             const homeData = data.pages.find(p => p.type.toLowerCase() === 'home');
             if (homeData) {
                 document.getElementById('profile-text').innerHTML = homeData.text.split('\n\n').map(t => `<p>${t.replace(/\n/g, '<br>')}</p>`).join('');
             }
 
-            // Works List
             const worksContainer = document.getElementById('works-list');
             worksContainer.innerHTML = data.works.map(w => `
                 <div class="mb-10">
@@ -297,7 +300,6 @@
                 </div>
             `).join('');
 
-            // Social Links
             const linksContainer = document.getElementById('links-container');
             linksContainer.innerHTML = data.links.map(l => `
                 <a href="${l.url}" target="_blank" class="py-6 border-b px-4 flex justify-between items-center group" style="border-color: rgba(202, 7, 68, 0.1);">
