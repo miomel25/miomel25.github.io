@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>歌人ポートフォリオ | 仲井澪</title>
+    <!-- タイトルを変更しました -->
+    <title>ポートフォリオ | 仲井澪</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -384,12 +385,14 @@
                 document.getElementById('profile-text').innerHTML = (homeData.text || "").split('\n\n').map(t => `<p>${t.replace(/\n/g, '<br>')}</p>`).join('');
             }
 
-            // WORKSの並び替えを行わず、スプレッドシートの順（受け取った配列の順）で表示
+            // WORKS: 配列の順序通り（スプレッドシートの行順）に表示する
+            // 修正: linkUrlがある場合にDetailリンクを表示する処理を追加
             const worksContainer = document.getElementById('works-list');
             worksContainer.innerHTML = (data.works || []).map(w => `
                 <div class="mb-10">
                     <span class="text-[10px] tracking-widest block mb-1 opacity-60 font-bold">${w.year}</span>
-                    <h3 class="text-md font-medium">${w.content}</h3>
+                    <h3 class="text-md font-medium mb-2">${w.content}</h3>
+                    ${w.linkUrl ? `<a href="${w.linkUrl}" target="_blank" class="text-xs border-b border-current opacity-50 hover:opacity-100 transition-opacity">Detail</a>` : ''}
                 </div>
             `).join('');
 
