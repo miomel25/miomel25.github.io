@@ -386,11 +386,11 @@
             }
 
             // WORKS: 配列の順序通り（スプレッドシートの行順）に表示する
-            // 修正: linkUrlがある場合にDetailリンクを表示する処理を追加
+            // 修正: w.year が falsy な場合は空文字を表示する
             const worksContainer = document.getElementById('works-list');
             worksContainer.innerHTML = (data.works || []).map(w => `
                 <div class="mb-10">
-                    <span class="text-[10px] tracking-widest block mb-1 opacity-60 font-bold">${w.year}</span>
+                    <span class="text-[10px] tracking-widest block mb-1 opacity-60 font-bold">${w.year || ""}</span>
                     <h3 class="text-md font-medium mb-2">${w.content}</h3>
                     ${w.linkUrl ? `<a href="${w.linkUrl}" target="_blank" class="text-xs border-b border-current opacity-50 hover:opacity-100 transition-opacity">Detail</a>` : ''}
                 </div>
