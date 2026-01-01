@@ -384,6 +384,7 @@
                 document.getElementById('profile-text').innerHTML = (homeData.text || "").split('\n\n').map(t => `<p>${t.replace(/\n/g, '<br>')}</p>`).join('');
             }
 
+            // WORKSの並び替えを行わず、スプレッドシートの順（受け取った配列の順）で表示
             const worksContainer = document.getElementById('works-list');
             worksContainer.innerHTML = (data.works || []).map(w => `
                 <div class="mb-10">
