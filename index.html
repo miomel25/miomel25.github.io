@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ポートフォリオ | 仲井澪</title>
+    <title>歌人ポートフォリオ | 仲井澪</title>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
             --bg-color: #fbdff6;
             --text-color: #ca0744;
+            --accent-color: #ca0744;
         }
         body {
             font-family: "游ゴシック体", YuGothic, "游ゴシック", "Yu Gothic", "Noto Serif JP", sans-serif;
@@ -19,6 +21,8 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
+
+        /* Side Menu Settings */
         #side-menu {
             position: fixed;
             top: 0;
@@ -36,6 +40,7 @@
             overflow-y: auto;
         }
         #side-menu.open { left: 0; }
+
         #menu-overlay {
             position: fixed;
             top: 0;
@@ -50,6 +55,7 @@
             transition: opacity 0.4s;
         }
         #menu-overlay.show { display: block; opacity: 1; }
+
         #menu-btn {
             position: fixed;
             top: 25px;
@@ -68,29 +74,28 @@
         #menu-btn.open .btn-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
         #menu-btn.open .btn-line:nth-child(2) { opacity: 0; }
         #menu-btn.open .btn-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
         .nav-link {
             font-size: 1.1rem;
             font-weight: 500;
             letter-spacing: 0.1em;
             cursor: pointer;
             transition: opacity 0.3s;
-            display: block;
         }
         .nav-link:hover { opacity: 0.5; }
-        .content-section { display: none; animation: fadeIn 0.8s ease-out forwards; }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
         .content-section.active { display: block; }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .tanka-line {
-            margin-bottom: 3.5rem;
-            letter-spacing: 0.15em;
-            display: flex;
-            justify-content: center;
-            width: 100%;
-        }
-        .tanka-text { font-size: clamp(1rem, 4vw, 1.4rem); text-align: center; }
+
+        /* Loading */
         #loading {
             position: fixed;
             inset: 0;
@@ -100,8 +105,65 @@
             background-color: var(--bg-color);
             z-index: 200;
             font-weight: bold;
+            letter-spacing: 0.3em;
+        }
+
+        /* 横スクロールコンテナ */
+        #renusaku-container {
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding: 1rem 0;
+            direction: ltr;
+            scrollbar-width: thin;
+            scrollbar-color: var(--text-color) transparent;
+            display: flex;
+            align-items: center;
+            min-height: 60vh;
         }
         
+        #renusaku-container::-webkit-scrollbar { height: 2px; }
+        #renusaku-container::-webkit-scrollbar-thumb { background: var(--text-color); }
+
+        #renusaku-content {
+            display: flex;
+            height: fit-content;
+            padding: 5vh 15vw;
+            flex-direction: row-reverse;
+            white-space: nowrap;
+            width: max-content;
+        }
+
+        .tanka-line {
+            flex-shrink: 0;
+            margin-right: 4.5rem;
+            height: fit-content;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            writing-mode: vertical-rl;
+            -webkit-writing-mode: vertical-rl;
+            text-combine-upright: none;
+            padding-bottom: 2rem;
+        }
+
+        .tanka-text {
+            font-size: clamp(0.9rem, 1.8vh, 1.5rem); 
+            font-weight: 500;
+            letter-spacing: 0.4em;
+            line-height: 1.5;
+            white-space: nowrap;
+            text-orientation: mixed;
+        }
+
+        .section-title {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-weight: bold;
+        }
+
         /* Form Styles */
         .contact-form {
             text-align: left;
@@ -147,6 +209,11 @@
             background-color: var(--text-color);
             color: var(--bg-color);
         }
+
+        footer {
+            border-top: 1px solid var(--text-color);
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -158,6 +225,7 @@
         <div class="btn-line"></div>
         <div class="btn-line"></div>
     </div>
+
     <div id="menu-overlay" onclick="toggleMenu()"></div>
 
     <nav id="side-menu">
@@ -171,34 +239,38 @@
         <a onclick="showPage('contact'); toggleMenu();" class="nav-link">Contact</a>
     </nav>
 
-    <main class="flex-grow pt-32 pb-24 px-6 max-w-4xl mx-auto w-full">
+    <main class="flex-grow pt-32 pb-24 px-6 max-w-5xl mx-auto w-full">
         <div id="error-message" class="hidden text-center p-10 border border-current"></div>
 
         <section id="home" class="content-section max-w-2xl mx-auto">
-            <h2 class="opacity-50 text-sm font-bold mb-12 tracking-[0.3em]">PROFILE</h2>
+            <h2 class="section-title text-xl mb-12 tracking-[0.3em]">PROFILE</h2>
             <div id="profile-text" class="space-y-8 leading-relaxed text-lg"></div>
         </section>
 
-        <section id="rensaku-template" class="content-section w-full">
-            <h2 id="rensaku-title" class="text-2xl mb-20 tracking-[0.4em] text-center font-bold"></h2>
-            <div id="rensaku-content" class="space-y-16"></div>
+        <section id="renusaku-template" class="content-section w-full">
+            <h2 id="renusaku-title" class="text-2xl mb-12 tracking-[0.4em] text-center font-bold"></h2>
+            <div id="renusaku-container">
+                <div id="renusaku-content"></div>
+            </div>
         </section>
 
         <section id="works" class="content-section max-w-2xl mx-auto">
-            <h2 class="opacity-50 text-sm font-bold mb-12 tracking-[0.3em]">WORKS</h2>
+            <h2 class="section-title text-xl mb-12 tracking-[0.3em]">WORKS</h2>
             <div id="works-list" class="space-y-12"></div>
         </section>
 
         <section id="link" class="content-section max-w-2xl mx-auto">
-            <h2 class="opacity-50 text-sm font-bold mb-12 tracking-[0.3em]">LINK</h2>
+            <h2 class="section-title text-xl mb-12 tracking-[0.3em]">LINK</h2>
             <div id="links-container" class="grid grid-cols-1 gap-5"></div>
         </section>
 
         <section id="contact" class="content-section max-w-2xl mx-auto">
-            <h2 class="opacity-50 text-sm font-bold mb-12 tracking-[0.3em]">CONTACT</h2>
+            <h2 class="section-title text-xl mb-12 tracking-[0.3em]">CONTACT</h2>
             
             <div class="max-w-xl mx-auto">
-                <p class="opacity-80 text-sm mb-8 text-center">お問い合わせは以下のフォームよりお願いいたします。<br>送信ボタンを押すとメールソフトが起動します。</p>
+                <div class="rounded-lg p-12 text-center border mb-12" style="border-color: var(--text-color); background-color: rgba(202, 7, 68, 0.03);">
+                    <p class="opacity-80 text-sm mb-4">お問い合わせはSNSのDM、または以下のフォームよりお願いいたします。</p>
+                </div>
                 
                 <form id="email-form" class="contact-form">
                     <div class="form-group">
@@ -216,35 +288,38 @@
                     <button type="submit" class="submit-btn">メールを作成する</button>
                 </form>
 
-                <div class="mt-16 pt-12 border-t border-current border-opacity-20 text-center">
-                    <p class="text-[10px] opacity-50 tracking-widest uppercase mb-2">Direct Mail</p>
-                    <p class="text-sm tracking-wider font-medium">nakaimio0125@gmail.com</p>
+                <div class="mt-16 pt-12 text-center opacity-60">
+                    <p class="text-[10px] tracking-widest uppercase mb-2">Direct Mail</p>
+                    <p class="text-sm tracking-wider font-medium">nakaimio.tanka@gmail.com</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="py-12 text-center text-[10px] tracking-[0.2em] border-t border-current opacity-30">
-        <p>&copy; <span id="year"></span> MIO NAKAI</p>
+    <footer class="py-12 text-center text-[10px] tracking-[0.2em]">
+        <p>&copy; <span id="year"></span> MIO NAKAI ALL RIGHTS RESERVED.</p>
     </footer>
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbw-4ORzhR9VZE70928Nv6DvJaa5m_YnKQUA9TkgaJ6B_8NP4CQ8hsmB_NQ7LrQkQ1EV/exec";
-        const MY_GMAIL = "nakaimio0125@gmail.com";
+        const MY_GMAIL = "nakaimio.tanka@gmail.com";
         let currentData = null;
 
         function toggleMenu() {
-            document.getElementById('side-menu').classList.toggle('open');
-            document.getElementById('menu-btn').classList.toggle('open');
-            document.getElementById('menu-overlay').classList.toggle('show');
+            const menu = document.getElementById('side-menu');
+            const btn = document.getElementById('menu-btn');
+            const overlay = document.getElementById('menu-overlay');
+            menu.classList.toggle('open');
+            btn.classList.toggle('open');
+            overlay.classList.toggle('show');
         }
 
         function showPage(pageId) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            if (pageId.startsWith('rensaku-')) {
-                const id = pageId.replace('rensaku-', '');
-                renderRensaku(id);
-                document.getElementById('rensaku-template').classList.add('active');
+            if (pageId.startsWith('renusaku-')) {
+                const id = pageId.replace('renusaku-', '');
+                renderRenusaku(id);
+                document.getElementById('renusaku-template').classList.add('active');
             } else {
                 const section = document.getElementById(pageId);
                 if (section) section.classList.add('active');
@@ -252,55 +327,81 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function renderRensaku(id) {
-            const titleElement = document.getElementById('rensaku-title');
-            const contentElement = document.getElementById('rensaku-content');
+        function renderRenusaku(id) {
+            const titleElement = document.getElementById('renusaku-title');
+            const contentElement = document.getElementById('renusaku-content');
             const pageInfo = currentData.pages.find(p => p.id === id);
             const verses = currentData.verses.filter(v => v.pageId === id).sort((a,b) => a.order - b.order);
             
             titleElement.innerText = pageInfo ? pageInfo.title : "";
-            contentElement.innerHTML = verses.length > 0 
-                ? verses.map(v => `<div class="tanka-line"><p class="tanka-text">${v.content.replace(/\n/g, '<br>')}</p></div>`).join('')
-                : '<p class="text-center opacity-50">作品がありません</p>';
+            
+            contentElement.innerHTML = verses.map(v => `
+                <div class="tanka-line">
+                    <p class="tanka-text">${v.content}</p>
+                </div>
+            `).join('');
+
+            const container = document.getElementById('renusaku-container');
+            
+            // 横スクロールの制御（マウスホイールを横に変換）
+            const handleWheel = (e) => {
+                if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                    e.preventDefault();
+                    container.scrollLeft += e.deltaY;
+                }
+            };
+            
+            container.removeEventListener('wheel', handleWheel);
+            container.addEventListener('wheel', handleWheel, { passive: false });
+
+            // 初期位置を右端にする（縦書き作品の開始位置）
+            setTimeout(() => {
+                container.scrollLeft = container.scrollWidth;
+            }, 50);
         }
 
         function buildUI(data) {
             currentData = data;
             document.getElementById('year').innerText = new Date().getFullYear();
             
+            // ナビゲーション構築
             const rensakuNav = document.getElementById('rensaku-links-nav');
             rensakuNav.innerHTML = '';
             
             const rensakuPages = data.pages.filter(p => {
                 const t = String(p.type || "").toLowerCase();
-                return t.includes('rensaku') || t.includes('renusaku');
+                return t.includes('renusaku') || t.includes('rensaku');
             });
 
             rensakuPages.forEach(p => {
                 const a = document.createElement('a');
                 a.className = "nav-link";
                 a.innerText = p.title;
-                a.onclick = () => { showPage(`rensaku-${p.id}`); toggleMenu(); };
+                a.onclick = () => { showPage(`renusaku-${p.id}`); toggleMenu(); };
                 rensakuNav.appendChild(a);
             });
 
+            // プロフィール構築
             const homeData = data.pages.find(p => String(p.type || "").toLowerCase().includes('home'));
             if (homeData) {
                 document.getElementById('profile-text').innerHTML = (homeData.text || "").split('\n\n').map(t => `<p>${t.replace(/\n/g, '<br>')}</p>`).join('');
             }
 
-            document.getElementById('works-list').innerHTML = (data.works || []).map(w => `
-                <div>
-                    <span class="text-[10px] opacity-50 font-bold">${w.year}</span>
-                    <h3 class="text-md">${w.content}</h3>
-                    ${w.linkUrl ? `<a href="${w.linkUrl}" target="_blank" class="text-xs border-b border-current opacity-50">Detail</a>` : ''}
+            // 実績構築
+            const worksContainer = document.getElementById('works-list');
+            worksContainer.innerHTML = (data.works || []).map(w => `
+                <div class="mb-10">
+                    <span class="text-[10px] tracking-widest block mb-1 opacity-60 font-bold">${w.year}</span>
+                    <h3 class="text-md font-medium">${w.content}</h3>
                 </div>
             `).join('');
 
-            document.getElementById('links-container').innerHTML = (data.links || []).map(l => `
-                <a href="${l.url}" target="_blank" class="py-6 border-b border-current border-opacity-10 flex justify-between items-center group">
+            // リンク構築
+            const linksContainer = document.getElementById('links-container');
+            linksContainer.innerHTML = (data.links || []).map(l => `
+                <a href="${l.url}" target="_blank" class="py-6 border-b px-4 flex justify-between items-center group" style="border-color: rgba(202, 7, 68, 0.1);">
                     <span class="text-sm tracking-widest font-medium">${l.name}</span>
-                    <span class="opacity-30 group-hover:translate-x-1 transition-all">→</span>
+                    <span class="text-xs opacity-30 group-hover:translate-x-1 transition-all">→</span>
                 </a>
             `).join('');
 
@@ -319,13 +420,10 @@
         // Email Form Handling
         document.getElementById('email-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const name = document.getElementById('form-name').value;
             const subject = document.getElementById('form-subject').value;
             const body = document.getElementById('form-message').value;
-            
             const mailtoLink = `mailto:${MY_GMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("お名前: " + name + "\n\n" + body)}`;
-            
             window.location.href = mailtoLink;
         });
 
