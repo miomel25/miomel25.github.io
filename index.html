@@ -405,8 +405,8 @@
             }).join('');
             
             // HOGEの表示
-            const HogeContainer = document.getElementById('hogehoge-list');
-            HogeContainer.innerHTML = (data.hogehoge || []).map(h => {
+            const hogeContainer = document.getElementById('hogehoge-list');
+            hogeContainer.innerHTML = (data.hogehoge || []).map(h => {
                 const displayTitle = (h.title && String(h.title).trim() !== "") ? String(h.title).trim() : "";  
                 return `
                 <div class="mb-10">
