@@ -398,7 +398,7 @@
 
 		titleElement.innerText = title.toUpperCase();
 		
-		const items = currentData.hogehoge || []).filter(h => String(h.title).trim() === title);
+		const items = (currentData.hogehoge || []).filter(h => String(h.title).trim() === title);
 
 		detailContainer.innerHTML = items.map(h => `
 			<div class="mb-8">
