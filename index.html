@@ -239,7 +239,6 @@
         <a onclick="showPage('works'); toggleMenu();" class="nav-link">Works</a>
         <a onclick="showPage('link'); toggleMenu();" class="nav-link">Link</a>
         <a onclick="showPage('contact'); toggleMenu();" class="nav-link">Contact</a>
-/*        <a onclick="showPage('hogehoge'); toggleMenu();" class="nav-link">Hoge</a>*/
 	<a onclick="showLastHogePage();toggleMenu();"class="nav-link">Hoge</a>
     </nav>
 
@@ -470,20 +469,8 @@
                 </div>
                 `;
             }).join('');
-            
-            // HOGEの表示
-/*            const hogeContainer = document.getElementById('hogehoge-list');
-            hogeContainer.innerHTML = (data.hogehoge || []).map(h => {
-                const displayTitle = (h.title && String(h.title).trim() !== "") ? String(h.title).trim() : "";  
-                return `
-                <div class="mb-10">
-                    <span class="text-[1.1rem] tracking-widest block mb-1 opacity-80 font-bold">${displayTitle}</span>
-                    <h3 class="text-md font-medium mb-2">${h.content}</h3>
-                    ${h.linkUrl ? `<a href="${h.linkUrl}" target="_blank" class="text-xs border-b border-current opacity-50 hover:opacity-100 transition-opacity">Hoge</a>` : ''}
-                </div>
-                `;
-            }).join('');
-*/
+
+		//HOGE	
 	    hogeTitlesOrder = [];
 	    (data.hogehoge || []).forEach(h => {
 		const t = String(h.title || "").trim();
