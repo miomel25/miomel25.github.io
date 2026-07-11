@@ -239,7 +239,8 @@
         <a onclick="showPage('works'); toggleMenu();" class="nav-link">Works</a>
         <a onclick="showPage('link'); toggleMenu();" class="nav-link">Link</a>
         <a onclick="showPage('contact'); toggleMenu();" class="nav-link">Contact</a>
-        <a onclick="showPage('hogehoge'); toggleMenu();" class="nav-link">Hoge</a>
+/*        <a onclick="showPage('hogehoge'); toggleMenu();" class="nav-link">Hoge</a>*/
+	<a onclick="showLastHogePage();toggleMenu();"class="nav-link">Hoge</a>
     </nav>
 
     <main class="flex-grow pt-32 pb-24 px-6 max-w-5xl mx-auto w-full">
@@ -267,10 +268,21 @@
             <div id="links-container" class="grid grid-cols-1 gap-5"></div>
         </section>
 
-        <section id="hogehoge" class="content-section max-w-2xl mx-auto">
+/*        <section id="hogehoge" class="content-section max-w-2xl mx-auto">
             <h2 class="section-title text-xl mb-12 tracking-[0.3em]">HOGE</h2>
             <div id="hogehoge-list" class="grid grid-cols-1 gap-5"></div>
         </section>
+*/
+	<section id="hogehoge-template" class="content-section max-w-2xl mx-auto">
+		<h2 id="hogehoge-title" class="section-title text-xl mb-12 tracking-[0.3em]">HOGE</h2>
+		<div id="hogehoge-detail" class="space-y-6"><div>
+
+		<div id="hoge-pagination" class="mt-16 pt-8 border-t flex justify-between text-sm tracking-widest" style="border-color: rgba(202,7,68,0.1);">
+			<div id="hoge-prev-btn" class="cursor-pointer opacity-70 hover:opacity-100 select-none"></div>
+			<div id="hoge-next-btn" class="cursor-pointer opacity-70 hover:opacity-100 select-none ml-auto"></div>
+		</div>
+	</section>
+	
 
         <section id="contact" class="content-section max-w-2xl mx-auto">
             <h2 class="section-title text-xl mb-12 tracking-[0.3em]">CONTACT</h2>
@@ -312,6 +324,7 @@
         const GAS_URL = "https://script.google.com/macros/s/AKfycbw-4ORzhR9VZE70928Nv6DvJaa5m_YnKQUA9TkgaJ6B_8NP4CQ8hsmB_NQ7LrQkQ1EV/exec";
         const MY_GMAIL = "nakaimio0125@gmail.com";
         let currentData = null;
+	let hogeTitlesOrder = [];
 
         function toggleMenu() {
             const menu = document.getElementById('side-menu');
@@ -328,7 +341,12 @@
                 const id = pageId.replace('renusaku-', '');
                 renderRenusaku(id);
                 document.getElementById('renusaku-template').classList.add('active');
-            } else {
+	    } else if (pageId.startsWith('hoge-')){
+	        const encodedTitle = pageId.replace('hoge-','');
+		const title = decodeURIComponent(encodedTitle);
+		renderHogePage(title);
+		document.getElementById('hogehoge-template').classList.add('active');
+	    } else {
                 const section = document.getElementById(pageId);
                 if (section) section.classList.add('active');
             }
@@ -365,6 +383,51 @@
                 container.scrollLeft = container.scrollWidth;
             }, 50);
         }
+
+	function showLastHogePage(){
+		if (hogeTitlesOrder.length > 0){
+			showPage(`hoge-${encodeURIComponent(hogeTitlesOrder[0])}`);
+		} else {
+			showPage('hogehoge-template');
+		}
+	}
+
+	function renderHogePage(title){
+		const titleElement = document.getElementById('hogehoge-title');
+		const detailContainer = document.getElementById('hogehoge-detail');
+
+		titleElement.innerText = title.toUpperCase();
+		
+		const items = currentData.hogehoge || []).filter(h => String(h.title).trim() === title);
+
+		detailContainer.innerHTML = items.map(h => `
+			<div class="mb-8">
+				<p class="text-md leading-relaxed">${h.content.replace(/\n/g, '<br>')}</p>
+				${h.linkUrl ? `<div class="mt-2"><a href="${h.linkUrl}" target="_brank" class="text-xs border-b border-current opacity-50 hover:opacity-100 transition-opacity">Link</a></div>` : ''}
+			</div>
+		`).join('');
+
+		const prevBtn = document.getElementById('hoge-prev-btn');
+		const nextBtn = document.getElementById('hoge-next-btn');
+		const currentIndex = hogeTitlesOrder.indexOf(title);
+
+		if (currentIndex > 0){
+			const prevTitle = hogeTitlesOrder[currentIndex - 1];
+			prevBtn.innerHTML = `&lt;  ${prevTitle}`;
+			prevBtn.onclick = () => showPage(`hoge-${encodeURIComponent(prevTitle)}`);
+			prevBtn.style.display = 'block';
+		} else {
+			prevBtn.style.display = 'none';
+		}
+		
+		if (currentIndex >= 0 && currentIndex < hogeTitlesOrder.length - 1){
+			const nextTitle = hogeTitlesOrder[currentIndex + 1];
+			nextBtn.innerHTML = `${nextTitle} &gt;`;
+			nextBtn.onclick = () => showPage(`hoge-${encodeURIComponent(nextTitle)}`);
+			nextBtn.style.display = 'block';
+		} else {
+			nextBtn.style.display = 'none';
+		}
 
         function buildUI(data) {
             currentData = data;
@@ -407,7 +470,7 @@
             }).join('');
             
             // HOGEの表示
-            const hogeContainer = document.getElementById('hogehoge-list');
+/*            const hogeContainer = document.getElementById('hogehoge-list');
             hogeContainer.innerHTML = (data.hogehoge || []).map(h => {
                 const displayTitle = (h.title && String(h.title).trim() !== "") ? String(h.title).trim() : "";  
                 return `
@@ -418,6 +481,15 @@
                 </div>
                 `;
             }).join('');
+*/
+	    hogeTitlesOrder = [];
+	    (data.hogehoge || []).forEach(h => {
+		const t = String(h.title || "").trim();
+		if (t && !hogeTitlesOrder.includes(t)){
+			hogeTitlesOrder.push(t);
+		}
+	   });
+	   hogeTitlesOrder.reverse();
             
             const linksContainer = document.getElementById('links-container');
             linksContainer.innerHTML = (data.links || []).map(l => `
