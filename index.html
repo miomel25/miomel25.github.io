@@ -275,7 +275,7 @@
 */
 	<section id="hogehoge-template" class="content-section max-w-2xl mx-auto">
 		<h2 id="hogehoge-title" class="section-title text-xl mb-12 tracking-[0.3em]">HOGE</h2>
-		<div id="hogehoge-detail" class="space-y-6"><div>
+		<div id="hogehoge-detail" class="space-y-6"></div>
 
 		<div id="hoge-pagination" class="mt-16 pt-8 border-t flex justify-between text-sm tracking-widest" style="border-color: rgba(202,7,68,0.1);">
 			<div id="hoge-prev-btn" class="cursor-pointer opacity-70 hover:opacity-100 select-none"></div>
@@ -406,6 +406,7 @@
 				${h.linkUrl ? `<div class="mt-2"><a href="${h.linkUrl}" target="_brank" class="text-xs border-b border-current opacity-50 hover:opacity-100 transition-opacity">Link</a></div>` : ''}
 			</div>
 		`).join('');
+	
 
 		const prevBtn = document.getElementById('hoge-prev-btn');
 		const nextBtn = document.getElementById('hoge-next-btn');
@@ -428,6 +429,7 @@
 		} else {
 			nextBtn.style.display = 'none';
 		}
+	}
 
         function buildUI(data) {
             currentData = data;
@@ -464,7 +466,7 @@
                 <div class="mb-10">
                     <span class="text-[1.1rem] tracking-widest block mb-1 opacity-80 font-bold">${displayYear}</span>
                     <h3 class="text-md font-medium mb-2">${w.content}</h3>
-                    ${w.linkUrl ? `<a href="${w.linkUrl}" target="_blank" class="text-xs border-b border-current opacity-50 hover:opacity-100 transition-opacity">Link</a>` : ''}
+                    ${w.linkUrl ? `<a href="${w.linkUrl}" target="_brank" class="text-xs border-b border-current opacity-50 hover:opacity-100 transition-opacity">Link</a>` : ''}
                 </div>
                 `;
             }).join('');
